@@ -117,6 +117,9 @@ const TaskManagement = () => {
   const onDragEnd = async (result) => {
     if (!result.destination) return;
 
+    // Only allow users to change status via drag and drop
+    if (user?.role !== 'user') return;
+
     const { draggableId, destination } = result;
     const taskId = draggableId;
 
@@ -273,7 +276,7 @@ const TaskManagement = () => {
                               onEdit={user?.role === 'manager' ? handleEditTask : null}
                               onDelete={user?.role === 'manager' ? handleDeleteTask : null}
                               onStatusChange={handleStatusChange}
-                              canChangeStatus={true}
+                              canChangeStatus={user?.role === 'user'}
                             />
                           </div>
                         )}

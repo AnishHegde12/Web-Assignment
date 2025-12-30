@@ -33,12 +33,12 @@ router.get('/', auth, async (req, res) => {
     let query = {};
     
     // Users can only see tasks assigned to them
-    // Managers can see all tasks
+    // Managers can only see tasks they created
     if (req.user.role === 'user') {
       query.assignedTo = req.user._id;
     } else {
-      // Managers can see all tasks
-      query = {};
+      // Managers only see tasks they created
+      query.createdBy = req.user._id;
     }
 
     const tasks = await Task.find(query)
