@@ -1,3 +1,6 @@
+// Main server file for the Task Manager application
+// Sets up Express server, MongoDB connection, Socket.io for real-time updates, and API routes
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');

@@ -6,7 +6,7 @@ const { auth, isManager } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Helper function to create activity log
+// Helper function to log task-related activities for audit purposes
 const createActivity = async (taskId, userId, action, field = null, oldValue = null, newValue = null, comment = null) => {
   try {
     await Activity.create({

@@ -2,6 +2,23 @@
 
 A full-stack web application for managing tasks with user authentication, role-based access control, and real-time updates.
 
+## Getting Started
+
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB (local installation or MongoDB Atlas account)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd "Web Assignment"
+   ```
+
+2. Follow the setup instructions for backend and frontend.
+
 ## Features
 
 ### Core Features
@@ -91,12 +108,6 @@ A full-stack web application for managing tasks with user authentication, role-b
 ```
 
 ## Setup Instructions
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- MongoDB (local installation or MongoDB Atlas account)
-- npm or yarn
 
 ### Backend Setup
 
@@ -198,28 +209,296 @@ A full-stack web application for managing tasks with user authentication, role-b
 
 Click the moon/sun icon in the navigation bar to toggle between light and dark themes. Your preference is saved in localStorage.
 
-## API Endpoints
+## Sample Login Credentials
+
+For testing purposes, you can create accounts or use the following test accounts:
+
+- **Manager Account**:
+  - Email: manager@example.com
+  - Password: password123
+
+- **User Account**:
+  - Email: user@example.com
+  - Password: password123
+
+(Note: These are for development only. In production, use strong passwords.)
+
+## API Documentation
 
 ### Authentication
-- `POST /api/auth/signup` - Create a new account
-- `POST /api/auth/login` - Login to account
-- `GET /api/auth/me` - Get current user info
+
+#### POST /api/auth/signup
+Create a new user account.
+
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "role": "user"
+}
+```
+
+**Response (201):**
+```json
+{
+  "message": "User created successfully",
+  "user": {
+    "id": "user_id",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user"
+  },
+  "token": "jwt_token"
+}
+```
+
+**Status Codes:**
+- 201: Created
+- 400: Bad Request
+- 409: Conflict
+
+#### POST /api/auth/login
+Authenticate user and return JWT token.
+
+**Request Body:**
+```json
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response (200):**
+```json
+{
+  "message": "Login successful",
+  "user": {
+    "id": "user_id",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user"
+  },
+  "token": "jwt_token"
+}
+```
+
+**Status Codes:**
+- 200: OK
+- 400: Bad Request
+- 401: Unauthorized
+
+#### GET /api/auth/me
+Get current authenticated user info.
+
+**Headers:**
+- Authorization: Bearer <jwt_token>
+
+**Response (200):**
+```json
+{
+  "id": "user_id",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "role": "user"
+}
+```
+
+**Status Codes:**
+- 200: OK
+- 401: Unauthorized
 
 ### Tasks
-- `GET /api/tasks` - Get all tasks (paginated)
-- `GET /api/tasks/assigned` - Get tasks assigned to current user
-- `GET /api/tasks/created` - Get tasks created by current user (managers only)
-- `GET /api/tasks/:id` - Get a specific task
-- `POST /api/tasks` - Create a new task (managers only)
-- `PUT /api/tasks/:id` - Update a task
-- `DELETE /api/tasks/:id` - Delete a task (managers only)
+
+#### GET /api/tasks
+Get all tasks with pagination. Managers see tasks they created, users see assigned tasks.
+
+**Query Parameters:**
+- page (optional): Page number (default: 1)
+- limit (optional): Items per page (default: 10)
+
+**Headers:**
+- Authorization: Bearer <jwt_token>
+
+**Response (200):**
+```json
+{
+  "tasks": [
+    {
+      "id": "task_id",
+      "title": "Task Title",
+      "description": "Task description",
+      "status": "pending",
+      "priority": "medium",
+      "dueDate": "2023-12-31",
+      "assignedTo": "user_id",
+      "createdBy": "manager_id",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 50,
+    "pages": 5
+  }
+}
+```
+
+**Status Codes:**
+- 200: OK
+- 401: Unauthorized
+
+#### POST /api/tasks
+Create a new task (managers only).
+
+**Request Body:**
+```json
+{
+  "title": "New Task",
+  "description": "Task description",
+  "priority": "high",
+  "dueDate": "2023-12-31",
+  "assignedTo": "user_id"
+}
+```
+
+**Response (201):**
+```json
+{
+  "message": "Task created successfully",
+  "task": { ... }
+}
+```
+
+**Status Codes:**
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+
+#### PUT /api/tasks/:id
+Update a task. Managers can update any field, users can only update status.
+
+**Request Body (managers):**
+```json
+{
+  "title": "Updated Task",
+  "description": "Updated description",
+  "status": "in-progress",
+  "priority": "low",
+  "dueDate": "2023-12-31",
+  "assignedTo": "user_id"
+}
+```
+
+**Request Body (users):**
+```json
+{
+  "status": "completed"
+}
+```
+
+**Response (200):**
+```json
+{
+  "message": "Task updated successfully",
+  "task": { ... }
+}
+```
+
+**Status Codes:**
+- 200: OK
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+
+#### DELETE /api/tasks/:id
+Delete a task (managers only, tasks they created).
+
+**Response (200):**
+```json
+{
+  "message": "Task deleted successfully"
+}
+```
+
+**Status Codes:**
+- 200: OK
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
 
 ### Activities
-- `GET /api/activities` - Get all activity logs (paginated)
-- `GET /api/activities/task/:taskId` - Get activity logs for a specific task
+
+#### GET /api/activities
+Get activity logs with pagination.
+
+**Query Parameters:**
+- page (optional): Page number
+- limit (optional): Items per page
+
+**Response (200):**
+```json
+{
+  "activities": [
+    {
+      "id": "activity_id",
+      "taskId": "task_id",
+      "userId": "user_id",
+      "action": "created",
+      "details": "Task created",
+      "timestamp": "2023-01-01T00:00:00.000Z"
+    }
+  ],
+  "pagination": { ... }
+}
+```
 
 ### Users
-- `GET /api/users` - Get all users (managers only)
+
+#### GET /api/users
+Get all users (managers only).
+
+**Response (200):**
+```json
+{
+  "users": [
+    {
+      "id": "user_id",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "user"
+    }
+  ]
+}
+```
+
+## Code Comments & Inline Documentation
+
+The codebase includes meaningful comments to help new developers understand the logic:
+
+### Backend Comments
+- **server.js** (line 1):
+  ```javascript
+  // Main server file for the Task Manager application
+  // Sets up Express server, MongoDB connection, Socket.io for real-time updates, and API routes
+  ```
+- **routes/tasks.js** (line 9):
+  ```javascript
+  // Helper function to log task-related activities for audit purposes
+  ```
+
+### Frontend Comments
+- **TaskCard.js** (line 5):
+  ```javascript
+  // Function to determine the color class for priority badges based on priority level
+  ```
+
+These comments provide context for complex logic and help maintain code readability.
 
 ## Security Features
 
@@ -261,6 +540,34 @@ The application uses React Context API for state management:
 - Calendar view for tasks
 - User profiles and avatars
 - Activity feed on dashboard
+
+## Deployment
+
+### Backend Deployment
+
+1. Set environment variables for production:
+   ```env
+   NODE_ENV=production
+   MONGODB_URI=your-production-mongodb-uri
+   JWT_SECRET=your-secure-jwt-secret
+   FRONTEND_URL=your-frontend-url
+   ```
+
+2. Build and start the server:
+   ```bash
+   npm start
+   ```
+
+### Frontend Deployment
+
+1. Build the production bundle:
+   ```bash
+   npm run build
+   ```
+
+2. Serve the `build` folder using a static server (e.g., Nginx, Apache, or Vercel/Netlify).
+
+For detailed deployment guides, refer to the hosting provider's documentation.
 
 ## Troubleshooting
 

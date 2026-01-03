@@ -2,6 +2,7 @@ import React from 'react';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 const TaskCard = ({ task, onEdit, onDelete, onStatusChange, canChangeStatus = false }) => {
+  // Function to determine the color class for priority badges based on priority level
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high':
